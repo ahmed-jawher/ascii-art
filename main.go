@@ -1,3 +1,4 @@
+// asciiart.go
 package main
 
 import (
@@ -7,41 +8,50 @@ import (
 )
 
 func main() {
-
 	if len(os.Args) != 2 {
-		fmt.Println("should be one argument")
-		os.Exit(0)
+		fmt.Println("usage: asciiart <text>")
+		os.Exit(1)
 	}
 
-	input := os.Args[1]
-	fmt.Println(AsciiArt(input))
+	art, err := AsciiArt(os.Args[1])
+	if err != nil {
+		fmt.Println("error:", err)
+		os.Exit(1)
+	}
+	fmt.Print(art)
 }
 
-func AsciiArt(input string) string {
-	inputFile, err := os.ReadFile("standard.txt")
+// AsciiArt يرسم النص المدخَل بخط standard.txt
+func AsciiArt(input string) (string, error) {
+	// 1) حوِّل السلسلة "\n" النصّية إلى محرف سطر جديد فعلي
+	input = strings.ReplaceAll(input, `\n`, "\n")
+
+	// 2) تحميل الخط
+	fontBytes, err := os.ReadFile("standard.txt")
 	if err != nil {
-		fmt.Println("Error reading file:", err)
-		return ""
+		return "", fmt.Errorf("read font: %w", err)
 	}
+	fontLines := strings.Split(string(fontBytes), "\n")
 
-	inputFileLines := strings.Split(string(inputFile), "\n")
-	words := strings.Split(input, "\\n")
-	result := ""
-
+	var out strings.Builder
+	words := strings.Split(input, "\n") // الأسطر الفعلية بعد التحويل
 
 	for _, word := range words {
-		for i:= 0; i < 8; i++ {
-			for _, char := range word {
-				if char < ' ' || char > '~' {
-					fmt.Println("Invalid character in input string")
-					os.Exit(1)
-					return ""
+		if word == "" { // سطر فارغ → سطر واحد فارغ في الخرج
+			out.WriteByte('\n')
+			continue
+		}
+
+		for row := 0; row < 8; row++ { // طباعة الصفوف 0..7
+			for _, ch := range word { // طباعة أحرف السطر الحالي
+				if ch < ' ' || ch > '~' {
+					return "", fmt.Errorf("unsupported character: %q", ch)
 				}
-				result += inputFileLines[i+(int(char- ' ')*9)+1]
+				idx := row + (int(ch-' ')*9) + 1
+				out.WriteString(fontLines[idx])
 			}
-			result += "\n"
+			out.WriteByte('\n')
 		}
 	}
-
-	return result
+	return out.String(), nil
 }
