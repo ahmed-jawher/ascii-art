@@ -9,13 +9,13 @@ import (
 
 func main() {
 	if len(os.Args) != 2 {
-		fmt.Println("usage: asciiart <text>")
+		fmt.Println("Error: Rong number of arguments")
 		os.Exit(1)
 	}
 
 	art, err := AsciiArt(os.Args[1])
 	if err != nil {
-		fmt.Println("error:", err)
+		fmt.Println(err)
 		os.Exit(1)
 	}
 	fmt.Print(art)
