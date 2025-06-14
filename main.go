@@ -21,34 +21,44 @@ func main() {
 	fmt.Print(art)
 }
 
-// AsciiArt يرسم النص المدخَل بخط standard.txt
 func AsciiArt(input string) (string, error) {
-	// 1) حوِّل السلسلة "\n" النصّية إلى محرف سطر جديد فعلي
+
 	input = strings.ReplaceAll(input, `\n`, "\n")
 
-	// 2) تحميل الخط
-	fontBytes, err := os.ReadFile("standard.txt")
+	fontBytes_txt, err := os.ReadFile("standard.txt")
 	if err != nil {
-		return "", fmt.Errorf("read font: %w", err)
+		return "", fmt.Errorf("read font: (\" %w \") ", err)
 	}
-	fontLines := strings.Split(string(fontBytes), "\n")
 
+	// solve windows problem with \r\n
+	fontContent := strings.ReplaceAll(string(fontBytes_txt), "\r\n", "\n")
+	// split font.txt content into lines
+	fontLines := strings.Split(fontContent, "\n")
+
+	// string.Builder better for storing strings
 	var out strings.Builder
-	words := strings.Split(input, "\n") // الأسطر الفعلية بعد التحويل
+	// split input into words by newlines
+	lines := strings.Split(input, "\n")
 
-	for _, word := range words {
-		if word == "" { // سطر فارغ → سطر واحد فارغ في الخرج
+	// this loop for moving line by line
+	for _, Line := range lines {
+		// if the line is empty, just write a newline
+		if Line == "" {
 			out.WriteByte('\n')
 			continue
 		}
 
-		for row := 0; row < 8; row++ { // طباعة الصفوف 0..7
-			for _, ch := range word { // طباعة أحرف السطر الحالي
-				if ch < ' ' || ch > '~' {
-					return "", fmt.Errorf("unsupported character: %q", ch)
+		// this loop for drawing each word (8 lines for each word)
+		for row := 0; row < 8; row++ {
+			for i, char := range Line {
+				if char < ' ' || char > '~' {
+					return "", fmt.Errorf("unsupported character: %q", char)
 				}
-				idx := row + (int(ch-' ')*9) + 1
+				idx := row + (int(char-' ') * 9) + 1
 				out.WriteString(fontLines[idx])
+				if i != len([]rune(Line))-1 {
+					out.WriteByte(' ')
+				}
 			}
 			out.WriteByte('\n')
 		}
