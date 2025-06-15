@@ -8,8 +8,11 @@ import (
 )
 
 func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("Error: Rong number of arguments")
+	if len(os.Args) < 2 || os.Args[1] == "" {
+		return
+	}
+	if len(os.Args) > 2 {
+		fmt.Println("Error: Wrong number of arguments")
 		os.Exit(1)
 	}
 
@@ -39,6 +42,11 @@ func AsciiArt(input string) (string, error) {
 	var out strings.Builder
 	// split input into words by newlines
 	lines := strings.Split(input, "\n")
+
+	// solve $$ problem
+	if len(lines) > 0 && lines[0] == "" {
+		lines = lines[1:]
+	}
 
 	// this loop for moving line by line
 	for _, Line := range lines {
