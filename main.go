@@ -25,7 +25,7 @@ func main() {
 }
 
 func AsciiArt(input string) (string, error) {
-
+	// Replace \n with actual newlines
 	input = strings.ReplaceAll(input, `\n`, "\n")
 
 	fontBytes_txt, err := os.ReadFile("standard.txt")
@@ -35,24 +35,18 @@ func AsciiArt(input string) (string, error) {
 
 	// solve windows problem with \r\n
 	fontContent := strings.ReplaceAll(string(fontBytes_txt), "\r\n", "\n")
-	// split font.txt content into lines
 	fontLines := strings.Split(fontContent, "\n")
 
-	// string.Builder better for storing strings
 	var out strings.Builder
-	// split input into words by newlines
 	lines := strings.Split(input, "\n")
 
-	// solve $$ problem
-	if len(lines) > 0 && lines[0] == "" {
-		lines = lines[1:]
-	}
-
-	// this loop for moving line by line
-	for _, Line := range lines {
+	for i, Line := range lines {
 		// if the line is empty, just write a newline
+		// but only if it's not the last line
 		if Line == "" {
-			out.WriteByte('\n')
+			if i < len(lines)-1 {
+				out.WriteByte('\n')
+			}
 			continue
 		}
 
