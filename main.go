@@ -35,9 +35,12 @@ func AsciiArt(input string) (string, error) {
 
 	// solve windows problem with \r\n
 	fontContent := strings.ReplaceAll(string(fontBytes_txt), "\r\n", "\n")
+	// split font.txt content into lines
 	fontLines := strings.Split(fontContent, "\n")
 
+	// string.Builder better for storing strings
 	var out strings.Builder
+	// split input into words by newlines
 	lines := strings.Split(input, "\n")
 
 	for i, Line := range lines {
